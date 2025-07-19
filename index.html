@@ -5,66 +5,534 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Personal Finance Analyzer</title>
     
-    <!-- Load dependencies in correct order -->
+    <!-- Load React -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/recharts@2.8.0/umd/Recharts.js"></script>
+    
+    <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Load Babel -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     
-    <!-- Lucide icons -->
+    <!-- Simple icons -->
     <script>
-        // Simple icon replacements since lucide-react is complex for browser
-        window.LucideIcons = {
-            Upload: () => React.createElement('svg', { width: 24, height: 24, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2 }, 
-                React.createElement('path', { d: "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" }),
-                React.createElement('polyline', { points: "7,10 12,15 17,10" }),
-                React.createElement('line', { x1: 12, y1: 15, x2: 12, y2: 3 })
-            ),
-            TrendingUp: () => React.createElement('svg', { width: 24, height: 24, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2 }, 
-                React.createElement('polyline', { points: "22,7 13.5,15.5 8.5,10.5 2,17" }),
-                React.createElement('polyline', { points: "16,7 22,7 22,13" })
-            ),
-            TrendingDown: () => React.createElement('svg', { width: 24, height: 24, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2 }, 
-                React.createElement('polyline', { points: "22,17 13.5,8.5 8.5,13.5 2,7" }),
-                React.createElement('polyline', { points: "16,17 22,17 22,11" })
-            ),
-            DollarSign: () => React.createElement('svg', { width: 24, height: 24, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2 }, 
-                React.createElement('line', { x1: 12, y1: 1, x2: 12, y2: 23 }),
-                React.createElement('path', { d: "M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" })
-            ),
-            CreditCard: () => React.createElement('svg', { width: 24, height: 24, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2 }, 
-                React.createElement('rect', { x: 1, y: 4, width: 22, height: 16, rx: 2, ry: 2 }),
-                React.createElement('line', { x1: 1, y1: 10, x2: 23, y2: 10 })
-            ),
-            Search: () => React.createElement('svg', { width: 24, height: 24, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2 }, 
-                React.createElement('circle', { cx: 11, cy: 11, r: 8 }),
-                React.createElement('path', { d: "M21 21l-4.35-4.35" })
-            ),
-            ChevronDown: () => React.createElement('svg', { width: 24, height: 24, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2 }, 
-                React.createElement('polyline', { points: "6,9 12,15 18,9" })
-            ),
-            ChevronRight: () => React.createElement('svg', { width: 24, height: 24, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2 }, 
-                React.createElement('polyline', { points: "9,18 15,12 9,6" })
-            ),
-            Eye: () => React.createElement('svg', { width: 24, height: 24, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2 }, 
-                React.createElement('path', { d: "M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" }),
-                React.createElement('circle', { cx: 12, cy: 12, r: 3 })
-            ),
-            EyeOff: () => React.createElement('svg', { width: 24, height: 24, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2 }, 
-                React.createElement('path', { d: "M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" }),
-                React.createElement('line', { x1: 1, y1: 1, x2: 23, y2: 23 })
-            ),
-            BarChart3: () => React.createElement('svg', { width: 24, height: 24, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2 }, 
-                React.createElement('line', { x1: 12, y1: 20, x2: 12, y2: 10 }),
-                React.createElement('line', { x1: 18, y1: 20, x2: 18, y2: 4 }),
-                React.createElement('line', { x1: 6, y1: 20, x2: 6, y2: 16 })
-            )
+        window.Icons = {
+            Upload: () => React.createElement('div', { 
+                className: "w-6 h-6 border-2 border-gray-400 rounded flex items-center justify-center text-gray-400 text-xs" 
+            }, "📁"),
+            TrendingUp: () => React.createElement('div', { 
+                className: "w-6 h-6 text-green-500 text-xl" 
+            }, "📈"),
+            TrendingDown: () => React.createElement('div', { 
+                className: "w-6 h-6 text-red-500 text-xl" 
+            }, "📉"),
+            DollarSign: () => React.createElement('div', { 
+                className: "w-6 h-6 text-blue-500 text-xl" 
+            }, "💰"),
+            CreditCard: () => React.createElement('div', { 
+                className: "w-6 h-6 text-purple-500 text-xl" 
+            }, "💳"),
+            Search: () => React.createElement('div', { 
+                className: "w-4 h-4 text-gray-400 text-sm" 
+            }, "🔍"),
+            ChevronDown: () => React.createElement('div', { 
+                className: "w-4 h-4 text-gray-400" 
+            }, "▼"),
+            ChevronRight: () => React.createElement('div', { 
+                className: "w-4 h-4 text-gray-400" 
+            }, "▶"),
+            Eye: () => React.createElement('div', { 
+                className: "w-4 h-4 text-gray-400" 
+            }, "👁"),
+            EyeOff: () => React.createElement('div', { 
+                className: "w-4 h-4 text-gray-400" 
+            }, "🚫")
         };
     </script>
 </head>
 <body>
     <div id="root"></div>
-    <script type="text/babel" src="app.js"></script>
+    <script type="text/babel">
+        const { useState, useMemo } = React;
+        
+        // Use the simple icons
+        const Upload = Icons.Upload;
+        const TrendingUp = Icons.TrendingUp;
+        const TrendingDown = Icons.TrendingDown;
+        const DollarSign = Icons.DollarSign;
+        const CreditCard = Icons.CreditCard;
+        const Search = Icons.Search;
+        const ChevronDown = Icons.ChevronDown;
+        const ChevronRight = Icons.ChevronRight;
+        const Eye = Icons.Eye;
+        const EyeOff = Icons.EyeOff;
+
+        const FinanceAnalyzer = () => {
+          const [transactions, setTransactions] = useState([]);
+          const [dateRange, setDateRange] = useState({ start: '', end: '' });
+          const [searchTerm, setSearchTerm] = useState('');
+          const [selectedCategory, setSelectedCategory] = useState('all');
+          const [expandedCategories, setExpandedCategories] = useState({});
+          const [showIncomeBreakdown, setShowIncomeBreakdown] = useState(false);
+
+          // Categorization function
+          const categorizeTransaction = (narration) => {
+            if (!narration) return 'Others';
+            const narrationLower = narration.toLowerCase();
+            
+            if (narrationLower.includes('zerodha')) return 'Stock Investment';
+            if (narrationLower.includes('leelavathi')) return 'Wife Spending';
+            if (narrationLower.includes('kotak securities')) return 'Kotak Money';
+            if (narrationLower.includes('autorelli')) return 'Car Spending';
+            if (narrationLower.includes('babyhug')) return 'Baby Spending';
+            if (narrationLower.includes('zomato')) return 'Zomato Food Orders';
+            if (narrationLower.includes('sudha coffee')) return 'Coffee Spending';
+            if (narrationLower.includes('fuel')) return 'Petrol';
+            if (narrationLower.includes('jewellers') || narrationLower.includes('thangamaliga')) return 'Jewellers';
+            if (narrationLower.includes('indian clearing corp') || narrationLower.includes('pgim') || narrationLower.includes('india corp clearing')) return 'Mutual Fund';
+            if (narrationLower.includes('openai') || narrationLower.includes('claude')) return 'AI Monthly Purchase';
+            if (narrationLower.includes('apollo')) return 'Medical Expense';
+            if (narrationLower.includes('bsnl') || narrationLower.includes('bharat sanchar nigam')) return 'Broadband Expense';
+            if (narrationLower.includes('airtel')) return 'DTH & Mobile Expense';
+            if (narrationLower.includes('fasttag')) return 'Toll Expense';
+            if (narrationLower.includes('appleservices')) return 'Apple Expenses';
+            if (narrationLower.includes('hlic')) return 'Term Plan';
+            if (narrationLower.includes('amazon')) return 'Amazon';
+            if (narrationLower.includes('alice')) return 'Alice Super Market';
+            if (narrationLower.includes('trends')) return 'Reliance Trends';
+            
+            // ATM withdrawals
+            if (narrationLower.includes('nwd') || narrationLower.includes('atw') || narrationLower.includes('eaw') || narrationLower.includes('nfs') || narrationLower.includes('awb')) return 'ATM Withdrawal';
+            if (narrationLower.includes('ats') && !narrationLower.includes('bharat') && !narrationLower.includes('sanchar')) return 'ATM Withdrawal';
+            
+            if (narrationLower.includes('upi')) return 'UPI Payments';
+            return 'Others';
+          };
+
+          // CSV Parser
+          const parseCSV = (csvText) => {
+            console.log('Starting CSV parse...');
+            const lines = csvText.trim().split('\n');
+            if (lines.length < 2) return [];
+            
+            const parsed = [];
+            
+            for (let i = 1; i < lines.length; i++) {
+              const line = lines[i].trim();
+              if (!line) continue;
+              
+              let values = line.split(',').map(v => v.trim());
+              
+              // Handle comma in narration issue
+              if (values.length === 8 && values[2] === '') {
+                values = [values[0], values[1], values[3], values[4], values[5], values[6], values[7]];
+              }
+              
+              if (values.length < 7) continue;
+              
+              const date = values[0].replace(/^"(.*)"$/, '$1').trim();
+              const narration = values[1].replace(/^"(.*)"$/, '$1').trim();
+              const debitAmountStr = values[3].replace(/^"(.*)"$/, '$1').trim();
+              const creditAmountStr = values[4].replace(/^"(.*)"$/, '$1').trim();
+              const closingBalanceStr = values[6].replace(/^"(.*)"$/, '$1').trim();
+              
+              const cleanAmount = (amountStr) => {
+                if (!amountStr) return 0;
+                const cleaned = amountStr.replace(/\s/g, '').replace(/[^\d.-]/g, '');
+                const parsed = parseFloat(cleaned);
+                return isNaN(parsed) ? 0 : Math.abs(parsed);
+              };
+              
+              const debitAmount = cleanAmount(debitAmountStr);
+              const creditAmount = cleanAmount(creditAmountStr);
+              const closingBalance = cleanAmount(closingBalanceStr);
+              
+              if (date && (debitAmount > 0 || creditAmount > 0)) {
+                parsed.push({
+                  date,
+                  narration,
+                  debitAmount,
+                  creditAmount,
+                  netAmount: creditAmount - debitAmount,
+                  closingBalance,
+                  category: categorizeTransaction(narration),
+                  type: debitAmount > 0 ? 'debit' : 'credit'
+                });
+              }
+            }
+            
+            console.log(`Parsed ${parsed.length} transactions`);
+            return parsed;
+          };
+
+          // File upload handler
+          const handleFileUpload = (event) => {
+            const file = event.target.files[0];
+            if (file) {
+              const reader = new FileReader();
+              reader.onload = (e) => {
+                const csvText = e.target.result;
+                const parsedTransactions = parseCSV(csvText);
+                setTransactions(parsedTransactions);
+                
+                if (parsedTransactions.length > 0) {
+                  const dates = parsedTransactions.map(t => {
+                    const [day, month, year] = t.date.split('/');
+                    const fullYear = year.length === 2 ? '20' + year : year;
+                    return new Date(fullYear, month - 1, day);
+                  });
+                  
+                  const minDate = new Date(Math.min(...dates));
+                  const maxDate = new Date(Math.max(...dates));
+                  
+                  setDateRange({ 
+                    start: minDate.toISOString().split('T')[0], 
+                    end: maxDate.toISOString().split('T')[0] 
+                  });
+                }
+              };
+              reader.readAsText(file);
+            }
+          };
+
+          // Filter transactions
+          const filteredTransactions = useMemo(() => {
+            return transactions.filter(transaction => {
+              const [day, month, year] = transaction.date.split('/');
+              const fullYear = year.length === 2 ? '20' + year : year;
+              const transactionDate = new Date(fullYear, month - 1, day);
+              
+              const startDate = dateRange.start ? new Date(dateRange.start) : new Date('1900-01-01');
+              const endDate = dateRange.end ? new Date(dateRange.end) : new Date('2100-12-31');
+              const dateInRange = transactionDate >= startDate && transactionDate <= endDate;
+              
+              const matchesSearch = searchTerm === '' || transaction.narration.toLowerCase().includes(searchTerm.toLowerCase());
+              const matchesCategory = selectedCategory === 'all' || transaction.category === selectedCategory;
+              
+              return dateInRange && matchesSearch && matchesCategory;
+            });
+          }, [transactions, dateRange, searchTerm, selectedCategory]);
+
+          // Summary calculations
+          const summary = useMemo(() => {
+            const totalDebit = filteredTransactions.reduce((sum, t) => sum + t.debitAmount, 0);
+            const totalCredit = filteredTransactions.reduce((sum, t) => sum + t.creditAmount, 0);
+            const netFlow = totalCredit - totalDebit;
+            
+            return {
+              totalSpending: totalDebit,
+              totalIncome: totalCredit,
+              netFlow,
+              transactionCount: filteredTransactions.length
+            };
+          }, [filteredTransactions]);
+
+          // Category data
+          const categoryData = useMemo(() => {
+            const categories = {};
+            
+            filteredTransactions.forEach(transaction => {
+              if (transaction.debitAmount > 0) {
+                if (!categories[transaction.category]) {
+                  categories[transaction.category] = {
+                    amount: 0,
+                    transactions: []
+                  };
+                }
+                categories[transaction.category].amount += transaction.debitAmount;
+                categories[transaction.category].transactions.push(transaction);
+              }
+            });
+            
+            return Object.entries(categories).map(([category, data]) => ({
+              category,
+              amount: data.amount,
+              transactions: data.transactions,
+              percentage: (data.amount / summary.totalSpending * 100).toFixed(1)
+            })).sort((a, b) => b.amount - a.amount);
+          }, [filteredTransactions, summary.totalSpending]);
+
+          // Income data
+          const incomeData = useMemo(() => {
+            return filteredTransactions
+              .filter(transaction => transaction.creditAmount > 0)
+              .sort((a, b) => b.creditAmount - a.creditAmount);
+          }, [filteredTransactions]);
+
+          const toggleCategoryExpansion = (category) => {
+            setExpandedCategories(prev => ({
+              ...prev,
+              [category]: !prev[category]
+            }));
+          };
+
+          const formatCurrency = (amount) => {
+            return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(amount);
+          };
+
+          const categories = ['all', ...new Set(transactions.map(t => t.category))];
+
+          return (
+            <div className="min-h-screen bg-gray-50 p-4">
+              <div className="max-w-7xl mx-auto">
+                {/* Header */}
+                <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+                  <h1 className="text-3xl font-bold text-gray-900 mb-2">Personal Finance Analyzer</h1>
+                  <p className="text-gray-600">Upload your bank statement to analyze your spending patterns and gain financial insights</p>
+                </div>
+
+                {/* File Upload */}
+                {transactions.length === 0 && (
+                  <div className="bg-white rounded-lg shadow-sm p-8 mb-6">
+                    <div className="text-center">
+                      <div className="mx-auto mb-4">
+                        <Upload />
+                      </div>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2">Upload Your Bank Statement</h3>
+                      <p className="text-gray-600 mb-6">Select your .txt bank statement file to get started</p>
+                      <input
+                        type="file"
+                        accept=".txt,.csv"
+                        onChange={handleFileUpload}
+                        className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Show content if transactions exist */}
+                {transactions.length > 0 && (
+                  <>
+                    {/* Controls */}
+                    <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Start Date</label>
+                          <input
+                            type="date"
+                            value={dateRange.start}
+                            onChange={(e) => setDateRange({...dateRange, start: e.target.value})}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">End Date</label>
+                          <input
+                            type="date"
+                            value={dateRange.end}
+                            onChange={(e) => setDateRange({...dateRange, end: e.target.value})}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                          <select
+                            value={selectedCategory}
+                            onChange={(e) => setSelectedCategory(e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          >
+                            {categories.map(cat => (
+                              <option key={cat} value={cat}>{cat === 'all' ? 'All Categories' : cat}</option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
+                      <div className="mt-4">
+                        <div className="relative">
+                          <div className="absolute left-3 top-3">
+                            <Search />
+                          </div>
+                          <input
+                            type="text"
+                            placeholder="Search transactions..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Summary Cards */}
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+                      <div className="bg-white rounded-lg shadow-sm p-6">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-sm text-gray-600">Total Spending</p>
+                            <p className="text-2xl font-bold text-red-600">{formatCurrency(summary.totalSpending)}</p>
+                          </div>
+                          <TrendingDown />
+                        </div>
+                      </div>
+                      <div className="bg-white rounded-lg shadow-sm p-6">
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center justify-between">
+                              <p className="text-sm text-gray-600">Total Income</p>
+                              <button
+                                onClick={() => setShowIncomeBreakdown(!showIncomeBreakdown)}
+                                className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
+                                title={showIncomeBreakdown ? "Hide breakdown" : "Show breakdown"}
+                              >
+                                {showIncomeBreakdown ? <EyeOff /> : <Eye />}
+                              </button>
+                            </div>
+                            <p className="text-2xl font-bold text-green-600">{formatCurrency(summary.totalIncome)}</p>
+                          </div>
+                          <TrendingUp />
+                        </div>
+                        {showIncomeBreakdown && incomeData.length > 0 && (
+                          <div className="mt-4 pt-4 border-t border-gray-100">
+                            <p className="text-xs text-gray-500 mb-2">Income Breakdown ({incomeData.length} transactions)</p>
+                            <div className="space-y-1 max-h-32 overflow-y-auto">
+                              {incomeData.map((transaction, index) => (
+                                <div key={index} className="flex justify-between items-center text-xs">
+                                  <span className="text-gray-700 truncate flex-1 mr-2">
+                                    {transaction.date} - {transaction.narration.substring(0, 25)}...
+                                  </span>
+                                  <span className="font-medium text-green-600">
+                                    +{formatCurrency(transaction.creditAmount)}
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                      <div className="bg-white rounded-lg shadow-sm p-6">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-sm text-gray-600">Net Flow</p>
+                            <p className={`text-2xl font-bold ${summary.netFlow >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                              {formatCurrency(summary.netFlow)}
+                            </p>
+                          </div>
+                          <DollarSign />
+                        </div>
+                      </div>
+                      <div className="bg-white rounded-lg shadow-sm p-6">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-sm text-gray-600">Transactions</p>
+                            <p className="text-2xl font-bold text-blue-600">{summary.transactionCount}</p>
+                          </div>
+                          <CreditCard />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Category Analysis */}
+                    <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-4">Category Analysis</h3>
+                      <div className="overflow-x-auto">
+                        <table className="w-full">
+                          <thead>
+                            <tr className="border-b border-gray-200">
+                              <th className="text-left py-3 px-4 font-semibold text-gray-900">Category</th>
+                              <th className="text-right py-3 px-4 font-semibold text-gray-900">Amount</th>
+                              <th className="text-right py-3 px-4 font-semibold text-gray-900">Percentage</th>
+                              <th className="text-center py-3 px-4 font-semibold text-gray-900">Transactions</th>
+                              <th className="text-center py-3 px-4 font-semibold text-gray-900">Details</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {categoryData.map((category, index) => (
+                              <React.Fragment key={category.category}>
+                                <tr className="border-b border-gray-100 hover:bg-gray-50">
+                                  <td className="py-3 px-4 text-gray-900 font-medium">{category.category}</td>
+                                  <td className="py-3 px-4 text-right text-gray-900">{formatCurrency(category.amount)}</td>
+                                  <td className="py-3 px-4 text-right text-gray-600">{category.percentage}%</td>
+                                  <td className="py-3 px-4 text-center text-gray-600">{category.transactions.length}</td>
+                                  <td className="py-3 px-4 text-center">
+                                    <button
+                                      onClick={() => toggleCategoryExpansion(category.category)}
+                                      className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
+                                      title={expandedCategories[category.category] ? "Hide transactions" : "Show transactions"}
+                                    >
+                                      {expandedCategories[category.category] ? <ChevronDown /> : <ChevronRight />}
+                                    </button>
+                                  </td>
+                                </tr>
+                                {expandedCategories[category.category] && (
+                                  <tr>
+                                    <td colSpan="5" className="px-4 py-0">
+                                      <div className="bg-gray-50 rounded-lg p-4 my-2">
+                                        <h4 className="text-sm font-medium text-gray-700 mb-3">
+                                          {category.category} Transactions ({category.transactions.length})
+                                        </h4>
+                                        <div className="space-y-2 max-h-60 overflow-y-auto">
+                                          {category.transactions
+                                            .sort((a, b) => b.debitAmount - a.debitAmount)
+                                            .map((transaction, txIndex) => (
+                                            <div key={txIndex} className="flex items-center justify-between bg-white rounded p-3 text-sm">
+                                              <div className="flex-1">
+                                                <div className="font-medium text-gray-900">{transaction.date}</div>
+                                                <div className="text-gray-600 truncate">{transaction.narration}</div>
+                                              </div>
+                                              <div className="text-right ml-4">
+                                                <div className="font-medium text-red-600">
+                                                  -{formatCurrency(transaction.debitAmount)}
+                                                </div>
+                                                <div className="text-xs text-gray-500">
+                                                  Balance: {formatCurrency(transaction.closingBalance)}
+                                                </div>
+                                              </div>
+                                            </div>
+                                          ))}
+                                        </div>
+                                      </div>
+                                    </td>
+                                  </tr>
+                                )}
+                              </React.Fragment>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+
+                    {/* Recent Transactions */}
+                    <div className="bg-white rounded-lg shadow-sm p-6">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Transactions</h3>
+                      <div className="overflow-x-auto">
+                        <table className="w-full">
+                          <thead>
+                            <tr className="border-b border-gray-200">
+                              <th className="text-left py-3 px-4 font-semibold text-gray-900">Date</th>
+                              <th className="text-left py-3 px-4 font-semibold text-gray-900">Description</th>
+                              <th className="text-left py-3 px-4 font-semibold text-gray-900">Category</th>
+                              <th className="text-right py-3 px-4 font-semibold text-gray-900">Amount</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {filteredTransactions.slice(0, 20).map((transaction, index) => (
+                              <tr key={index} className="border-b border-gray-100">
+                                <td className="py-3 px-4 text-gray-900">{transaction.date}</td>
+                                <td className="py-3 px-4 text-gray-900">{transaction.narration.substring(0, 50)}...</td>
+                                <td className="py-3 px-4">
+                                  <span className="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
+                                    {transaction.category}
+                                  </span>
+                                </td>
+                                <td className={`py-3 px-4 text-right font-medium ${transaction.debitAmount > 0 ? 'text-red-600' : 'text-green-600'}`}>
+                                  {transaction.debitAmount > 0 ? '-' : '+'}{formatCurrency(Math.abs(transaction.netAmount))}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+          );
+        };
+
+        // Render the app
+        ReactDOM.render(<FinanceAnalyzer />, document.getElementById('root'));
+    </script>
 </body>
 </html>
