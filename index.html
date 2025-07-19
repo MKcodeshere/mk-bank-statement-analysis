@@ -4,12 +4,64 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Personal Finance Analyzer</title>
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Load dependencies in correct order -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/recharts@2.8.0/umd/Recharts.js"></script>
-    <script src="https://unpkg.com/lucide-react@0.263.1/dist/umd/lucide-react.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Lucide icons -->
+    <script>
+        // Simple icon replacements since lucide-react is complex for browser
+        window.LucideIcons = {
+            Upload: () => React.createElement('svg', { width: 24, height: 24, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2 }, 
+                React.createElement('path', { d: "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" }),
+                React.createElement('polyline', { points: "7,10 12,15 17,10" }),
+                React.createElement('line', { x1: 12, y1: 15, x2: 12, y2: 3 })
+            ),
+            TrendingUp: () => React.createElement('svg', { width: 24, height: 24, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2 }, 
+                React.createElement('polyline', { points: "22,7 13.5,15.5 8.5,10.5 2,17" }),
+                React.createElement('polyline', { points: "16,7 22,7 22,13" })
+            ),
+            TrendingDown: () => React.createElement('svg', { width: 24, height: 24, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2 }, 
+                React.createElement('polyline', { points: "22,17 13.5,8.5 8.5,13.5 2,7" }),
+                React.createElement('polyline', { points: "16,17 22,17 22,11" })
+            ),
+            DollarSign: () => React.createElement('svg', { width: 24, height: 24, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2 }, 
+                React.createElement('line', { x1: 12, y1: 1, x2: 12, y2: 23 }),
+                React.createElement('path', { d: "M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" })
+            ),
+            CreditCard: () => React.createElement('svg', { width: 24, height: 24, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2 }, 
+                React.createElement('rect', { x: 1, y: 4, width: 22, height: 16, rx: 2, ry: 2 }),
+                React.createElement('line', { x1: 1, y1: 10, x2: 23, y2: 10 })
+            ),
+            Search: () => React.createElement('svg', { width: 24, height: 24, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2 }, 
+                React.createElement('circle', { cx: 11, cy: 11, r: 8 }),
+                React.createElement('path', { d: "M21 21l-4.35-4.35" })
+            ),
+            ChevronDown: () => React.createElement('svg', { width: 24, height: 24, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2 }, 
+                React.createElement('polyline', { points: "6,9 12,15 18,9" })
+            ),
+            ChevronRight: () => React.createElement('svg', { width: 24, height: 24, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2 }, 
+                React.createElement('polyline', { points: "9,18 15,12 9,6" })
+            ),
+            Eye: () => React.createElement('svg', { width: 24, height: 24, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2 }, 
+                React.createElement('path', { d: "M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" }),
+                React.createElement('circle', { cx: 12, cy: 12, r: 3 })
+            ),
+            EyeOff: () => React.createElement('svg', { width: 24, height: 24, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2 }, 
+                React.createElement('path', { d: "M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" }),
+                React.createElement('line', { x1: 1, y1: 1, x2: 23, y2: 23 })
+            ),
+            BarChart3: () => React.createElement('svg', { width: 24, height: 24, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2 }, 
+                React.createElement('line', { x1: 12, y1: 20, x2: 12, y2: 10 }),
+                React.createElement('line', { x1: 18, y1: 20, x2: 18, y2: 4 }),
+                React.createElement('line', { x1: 6, y1: 20, x2: 6, y2: 16 })
+            )
+        };
+    </script>
 </head>
 <body>
     <div id="root"></div>
