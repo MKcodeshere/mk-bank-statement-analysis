@@ -860,3 +860,4 @@ const FinanceAnalyzer = () => {
 };
 
 export default FinanceAnalyzer;
+ReactDOM.render(React.createElement(FinanceAnalyzer), document.getElementById('root'));
