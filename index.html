@@ -9,6 +9,9 @@
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     
+    <!-- Load Chart.js for reliable charting -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
     <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -47,14 +50,23 @@
             }, "👁"),
             EyeOff: () => React.createElement('div', { 
                 className: "w-4 h-4 text-gray-400" 
-            }, "🚫")
+            }, "🚫"),
+            BarChart3: () => React.createElement('div', { 
+                className: "w-6 h-6 text-gray-500 text-xl" 
+            }, "📊"),
+            PieChart: () => React.createElement('div', { 
+                className: "w-6 h-6 text-gray-500 text-xl" 
+            }, "🥧"),
+            Store: () => React.createElement('div', { 
+                className: "w-6 h-6 text-gray-500 text-xl" 
+            }, "🏪")
         };
     </script>
 </head>
 <body>
     <div id="root"></div>
     <script type="text/babel">
-        const { useState, useMemo } = React;
+        const { useState, useMemo, useEffect, useRef } = React;
         
         // Use the simple icons
         const Upload = Icons.Upload;
@@ -67,10 +79,152 @@
         const ChevronRight = Icons.ChevronRight;
         const Eye = Icons.Eye;
         const EyeOff = Icons.EyeOff;
+        const BarChart3 = Icons.BarChart3;
+        const PieChart = Icons.PieChart;
+        const Store = Icons.Store;
+
+        // Chart components using Chart.js
+        const LineChart = ({ data, title }) => {
+          const canvasRef = useRef(null);
+          const chartRef = useRef(null);
+
+          useEffect(() => {
+            if (canvasRef.current && data.length > 0) {
+              // Destroy existing chart
+              if (chartRef.current) {
+                chartRef.current.destroy();
+              }
+
+              const ctx = canvasRef.current.getContext('2d');
+              chartRef.current = new Chart(ctx, {
+                type: 'line',
+                data: {
+                  labels: data.map(d => d.period),
+                  datasets: [
+                    {
+                      label: 'Spending',
+                      data: data.map(d => d.spending),
+                      borderColor: '#ef4444',
+                      backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                      tension: 0.4,
+                      fill: false
+                    },
+                    {
+                      label: 'Income',
+                      data: data.map(d => d.income),
+                      borderColor: '#10b981',
+                      backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                      tension: 0.4,
+                      fill: false
+                    }
+                  ]
+                },
+                options: {
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  scales: {
+                    y: {
+                      beginAtZero: true,
+                      ticks: {
+                        callback: function(value) {
+                          return '₹' + (value / 1000).toFixed(0) + 'k';
+                        }
+                      }
+                    }
+                  },
+                  plugins: {
+                    tooltip: {
+                      callbacks: {
+                        label: function(context) {
+                          return context.dataset.label + ': ₹' + context.parsed.y.toLocaleString('en-IN');
+                        }
+                      }
+                    }
+                  }
+                }
+              });
+            }
+
+            return () => {
+              if (chartRef.current) {
+                chartRef.current.destroy();
+              }
+            };
+          }, [data]);
+
+          return (
+            <div className="relative h-80">
+              <canvas ref={canvasRef}></canvas>
+            </div>
+          );
+        };
+
+        const DoughnutChart = ({ data }) => {
+          const canvasRef = useRef(null);
+          const chartRef = useRef(null);
+
+          useEffect(() => {
+            if (canvasRef.current && data.length > 0) {
+              if (chartRef.current) {
+                chartRef.current.destroy();
+              }
+
+              const ctx = canvasRef.current.getContext('2d');
+              const colors = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4', '#f97316', '#84cc16', '#ec4899'];
+              
+              chartRef.current = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                  labels: data.map(d => d.category),
+                  datasets: [{
+                    data: data.map(d => d.amount),
+                    backgroundColor: colors.slice(0, data.length),
+                    borderWidth: 2,
+                    borderColor: '#ffffff'
+                  }]
+                },
+                options: {
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  plugins: {
+                    legend: {
+                      position: 'bottom',
+                      labels: {
+                        padding: 20,
+                        usePointStyle: true
+                      }
+                    },
+                    tooltip: {
+                      callbacks: {
+                        label: function(context) {
+                          const percentage = ((context.parsed / data.reduce((sum, d) => sum + d.amount, 0)) * 100).toFixed(1);
+                          return context.label + ': ₹' + context.parsed.toLocaleString('en-IN') + ` (${percentage}%)`;
+                        }
+                      }
+                    }
+                  }
+                }
+              });
+            }
+
+            return () => {
+              if (chartRef.current) {
+                chartRef.current.destroy();
+              }
+            };
+          }, [data]);
+
+          return (
+            <div className="relative h-80">
+              <canvas ref={canvasRef}></canvas>
+            </div>
+          );
+        };
 
         const FinanceAnalyzer = () => {
           const [transactions, setTransactions] = useState([]);
           const [dateRange, setDateRange] = useState({ start: '', end: '' });
+          const [selectedPeriod, setSelectedPeriod] = useState('monthly');
           const [searchTerm, setSearchTerm] = useState('');
           const [selectedCategory, setSelectedCategory] = useState('all');
           const [expandedCategories, setExpandedCategories] = useState({});
@@ -108,6 +262,11 @@
             
             if (narrationLower.includes('upi')) return 'UPI Payments';
             return 'Others';
+          };
+
+          const getMonthName = (monthIndex) => {
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            return months[monthIndex];
           };
 
           // CSV Parser
@@ -228,6 +387,55 @@
             };
           }, [filteredTransactions]);
 
+          // Group data by period for charts
+          const groupedData = useMemo(() => {
+            const groups = {};
+            
+            filteredTransactions.forEach(transaction => {
+              const [day, month, year] = transaction.date.split('/');
+              const fullYear = year.length === 2 ? '20' + year : year;
+              const date = new Date(fullYear, month - 1, day);
+              
+              let key, displayLabel;
+              
+              if (selectedPeriod === 'daily') {
+                key = `${fullYear}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+                displayLabel = `${day}/${month}`;
+              } else if (selectedPeriod === 'weekly') {
+                const weekStart = new Date(date);
+                weekStart.setDate(date.getDate() - date.getDay());
+                const weekEnd = new Date(weekStart);
+                weekEnd.setDate(weekStart.getDate() + 6);
+                key = weekStart.toISOString().split('T')[0];
+                displayLabel = `${weekStart.getDate()}/${weekStart.getMonth() + 1} - ${weekEnd.getDate()}/${weekEnd.getMonth() + 1}`;
+              } else {
+                key = `${fullYear}-${month.padStart(2, '0')}`;
+                displayLabel = `${getMonthName(parseInt(month) - 1)} ${fullYear}`;
+              }
+              
+              if (!groups[key]) {
+                groups[key] = { 
+                  period: key, 
+                  displayLabel,
+                  spending: 0, 
+                  income: 0, 
+                  date: date
+                };
+              }
+              
+              groups[key].spending += transaction.debitAmount;
+              groups[key].income += transaction.creditAmount;
+            });
+            
+            return Object.values(groups)
+              .sort((a, b) => a.date - b.date)
+              .map(group => ({
+                period: group.displayLabel,
+                spending: group.spending,
+                income: group.income
+              }));
+          }, [filteredTransactions, selectedPeriod]);
+
           // Category data
           const categoryData = useMemo(() => {
             const categories = {};
@@ -252,6 +460,37 @@
               percentage: (data.amount / summary.totalSpending * 100).toFixed(1)
             })).sort((a, b) => b.amount - a.amount);
           }, [filteredTransactions, summary.totalSpending]);
+
+          // Top merchants
+          const topMerchants = useMemo(() => {
+            const merchants = {};
+            
+            filteredTransactions.forEach(transaction => {
+              if (transaction.debitAmount > 0) {
+                // Extract merchant name from narration
+                let merchant = transaction.narration;
+                
+                // Try to extract meaningful merchant name
+                if (merchant.includes('UPI-')) {
+                  const upiPart = merchant.split('UPI-')[1];
+                  merchant = upiPart.split('-')[0] || merchant;
+                } else if (merchant.includes('POS')) {
+                  const posParts = merchant.split(' ');
+                  merchant = posParts.slice(2).join(' ').split(',')[0] || merchant;
+                }
+                
+                merchant = merchant.trim().substring(0, 30);
+                
+                if (!merchants[merchant]) {
+                  merchants[merchant] = { name: merchant, amount: 0, count: 0 };
+                }
+                merchants[merchant].amount += transaction.debitAmount;
+                merchants[merchant].count += 1;
+              }
+            });
+            
+            return Object.values(merchants).sort((a, b) => b.amount - a.amount).slice(0, 5);
+          }, [filteredTransactions]);
 
           // Income data
           const incomeData = useMemo(() => {
@@ -306,7 +545,7 @@
                   <>
                     {/* Controls */}
                     <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-2">Start Date</label>
                           <input
@@ -324,6 +563,18 @@
                             onChange={(e) => setDateRange({...dateRange, end: e.target.value})}
                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                           />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Period</label>
+                          <select
+                            value={selectedPeriod}
+                            onChange={(e) => setSelectedPeriod(e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          >
+                            <option value="daily">Daily</option>
+                            <option value="weekly">Weekly</option>
+                            <option value="monthly">Monthly</option>
+                          </select>
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
@@ -385,14 +636,19 @@
                         {showIncomeBreakdown && incomeData.length > 0 && (
                           <div className="mt-4 pt-4 border-t border-gray-100">
                             <p className="text-xs text-gray-500 mb-2">Income Breakdown ({incomeData.length} transactions)</p>
-                            <div className="space-y-1 max-h-32 overflow-y-auto">
+                            <div className="space-y-2 max-h-32 overflow-y-auto">
                               {incomeData.map((transaction, index) => (
-                                <div key={index} className="flex justify-between items-center text-xs">
-                                  <span className="text-gray-700 truncate flex-1 mr-2">
-                                    {transaction.date} - {transaction.narration.substring(0, 25)}...
-                                  </span>
-                                  <span className="font-medium text-green-600">
-                                    +{formatCurrency(transaction.creditAmount)}
+                                <div key={index} className="flex flex-col text-xs bg-gray-50 rounded p-2">
+                                  <div className="flex justify-between items-start">
+                                    <span className="text-gray-700 font-medium">
+                                      {transaction.date}
+                                    </span>
+                                    <span className="font-medium text-green-600 ml-2">
+                                      +{formatCurrency(transaction.creditAmount)}
+                                    </span>
+                                  </div>
+                                  <span className="text-gray-600 mt-1 text-left break-words">
+                                    {transaction.narration}
                                   </span>
                                 </div>
                               ))}
@@ -420,6 +676,86 @@
                           <CreditCard />
                         </div>
                       </div>
+                    </div>
+
+                    {/* Charts */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                      {/* Spending Trend Chart */}
+                      <div className="bg-white rounded-lg shadow-sm p-6">
+                        <div className="flex items-center mb-4">
+                          <BarChart3 />
+                          <h3 className="text-lg font-semibold text-gray-900 ml-2">
+                            Spending Trend ({selectedPeriod.charAt(0).toUpperCase() + selectedPeriod.slice(1)})
+                          </h3>
+                        </div>
+                        {groupedData.length > 0 ? (
+                          <LineChart data={groupedData} title="Spending Trend" />
+                        ) : (
+                          <div className="flex items-center justify-center h-80 text-gray-500">
+                            <div className="text-center">
+                              <BarChart3 />
+                              <p className="mt-2">No data available for the selected period</p>
+                              <p className="text-sm">Try adjusting your date range or filters</p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Category Pie Chart */}
+                      <div className="bg-white rounded-lg shadow-sm p-6">
+                        <div className="flex items-center mb-4">
+                          <PieChart />
+                          <h3 className="text-lg font-semibold text-gray-900 ml-2">Spending by Category</h3>
+                        </div>
+                        {categoryData.length > 0 ? (
+                          <DoughnutChart data={categoryData} />
+                        ) : (
+                          <div className="flex items-center justify-center h-80 text-gray-500">
+                            <div className="text-center">
+                              <PieChart />
+                              <p className="mt-2">No spending data available</p>
+                              <p className="text-sm">Upload transactions to see category breakdown</p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Top Merchants */}
+                    <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+                      <div className="flex items-center mb-4">
+                        <Store />
+                        <h3 className="text-lg font-semibold text-gray-900 ml-2">Top Merchants</h3>
+                      </div>
+                      {topMerchants.length > 0 ? (
+                        <div className="space-y-4">
+                          {topMerchants.map((merchant, index) => (
+                            <div key={merchant.name} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                              <div className="flex items-center">
+                                <div className="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold mr-3">
+                                  {index + 1}
+                                </div>
+                                <div>
+                                  <p className="font-medium text-gray-900">{merchant.name}</p>
+                                  <p className="text-sm text-gray-600">{merchant.count} transactions</p>
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                <p className="font-semibold text-gray-900">{formatCurrency(merchant.amount)}</p>
+                                <p className="text-sm text-gray-600">
+                                  Avg: {formatCurrency(merchant.amount / merchant.count)}
+                                </p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="text-center py-8 text-gray-500">
+                          <Store />
+                          <p className="mt-2">No merchant data available</p>
+                          <p className="text-sm">Upload transactions to see top merchants</p>
+                        </div>
+                      )}
                     </div>
 
                     {/* Category Analysis */}
@@ -468,7 +804,7 @@
                                             <div key={txIndex} className="flex items-center justify-between bg-white rounded p-3 text-sm">
                                               <div className="flex-1">
                                                 <div className="font-medium text-gray-900">{transaction.date}</div>
-                                                <div className="text-gray-600 truncate">{transaction.narration}</div>
+                                                <div className="text-gray-600">{transaction.narration}</div>
                                               </div>
                                               <div className="text-right ml-4">
                                                 <div className="font-medium text-red-600">
@@ -509,7 +845,14 @@
                             {filteredTransactions.slice(0, 20).map((transaction, index) => (
                               <tr key={index} className="border-b border-gray-100">
                                 <td className="py-3 px-4 text-gray-900">{transaction.date}</td>
-                                <td className="py-3 px-4 text-gray-900">{transaction.narration.substring(0, 50)}...</td>
+                                <td className="py-3 px-4 text-gray-900 max-w-md">
+                                  <div className="truncate" title={transaction.narration}>
+                                    {transaction.narration.length > 60 ? 
+                                      transaction.narration.substring(0, 60) + '...' : 
+                                      transaction.narration
+                                    }
+                                  </div>
+                                </td>
                                 <td className="py-3 px-4">
                                   <span className="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
                                     {transaction.category}
