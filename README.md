@@ -1,4 +1,4 @@
-# Personal Finance Analyzer
+# Personal Finance Analyzer - HDFC Bank Statements ( delimited Format) 
 
 A powerful web application to analyze your bank statements with interactive charts and detailed spending insights.
 
